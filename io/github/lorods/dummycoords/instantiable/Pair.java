@@ -1,4 +1,4 @@
-package io.github.lorods.dummycoords;
+package io.github.lorods.dummycoords.instantiable;
 
 import java.io.Serializable;
 import java.util.Random;
