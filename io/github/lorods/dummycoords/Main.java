@@ -6,15 +6,18 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -25,49 +28,110 @@ import io.github.lorods.dummycoords.interf.PairHandler;
 
 public class Main {
 
-	public static void createInterf(String mcoords) {
+	public static String ccoords;
+
+	public static void createInterf() {
+		AtomicBoolean is_exp = new AtomicBoolean(false);
 		Display display = new Display();
+		String sysfnname = display.getSystemFont().getFontData()[0].getName();
 		Shell shell = new Shell(display);
-		shell.setLayout(new GridLayout(1, false));
-		Label label = new Label(shell, SWT.NONE);
-		Composite comp = new Composite(shell, SWT.NONE);
+		GridLayout shlay = new GridLayout(1, false);
+		shell.setLayout(shlay);
+		Composite rowonec = new Composite(shell, SWT.NONE);
+		Button refrbtn = new Button(rowonec, SWT.NONE);
+		refrbtn.setBackground(new Color(119, 118, 123));
+		Label label = new Label(rowonec, SWT.NONE);
+		Composite rowtwoc = new Composite(shell, SWT.NONE);
 		GridLayout glay = new GridLayout(2, false);
 		glay.horizontalSpacing = 25;
-		glay.verticalSpacing = 25;
-		comp.setLayout(glay);
-		label.setText("Your new mock coordinates: " + mcoords);
-		Button expbtn = new Button(comp, SWT.CENTER);
-		Button openbtn = new Button(comp, SWT.CENTER);
+		rowtwoc.setLayout(glay);
+		rowonec.setLayout(glay);
+		setLabelTxt(ccoords, label);
+		refrbtn.setText("\u21BB"); // refresh char
+		refrbtn.setFont(new Font(display, sysfnname,
+				(int) Math.round(display.getSystemFont().getFontData()[0].getHeight() * 2.5), SWT.NORMAL));
+		refrbtn.setToolTipText("Caution: this will discard the current pair of coordinates and set a new one");
+		Button expbtn = new Button(rowtwoc, SWT.CENTER);
+		Button openbtn = new Button(rowtwoc, SWT.CENTER);
 		Button rembtn = new Button(shell, SWT.CENTER);
 		openbtn.setText("Open ./export.dat with the default text editor");
 		expbtn.setText("Append this pair to ./export.dat");
 		rembtn.setText("Delete ./export.dat");
+		refrbtn.pack();
 		openbtn.pack();
 		expbtn.pack();
 		rembtn.pack();
 		label.pack();
 		shell.pack();
-		GridData[] auxgrds = new GridData[3];
+		GridData[] auxgrds = new GridData[4];
 		auxgrds[0] = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
 		auxgrds[0].minimumWidth = (int) Math.round(openbtn.getSize().x * 1.1);
 		openbtn.setLayoutData(auxgrds[0]);
 		auxgrds[1] = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
-		auxgrds[1].minimumWidth = (int) Math.round(expbtn.getSize().x * 1.25);
+		auxgrds[1].minimumWidth = (int) Math.round(expbtn.getSize().x * 1.1);
 		expbtn.setLayoutData(auxgrds[1]);
+		rowonec.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+		rowtwoc.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+		rowonec.requestLayout();
+		rowtwoc.requestLayout();
 		auxgrds[2] = new GridData(SWT.CENTER, SWT.CENTER, true, false);
 		auxgrds[2].minimumWidth = (int) Math.round(rembtn.getSize().x * 1.25);
+		auxgrds[2].verticalIndent = 5;
 		rembtn.setLayoutData(auxgrds[2]);
-		int dimensX = (int) Math.round(comp.getSize().x * 1.25);
-		shell.setSize(dimensX, openbtn.getSize().y * 4);
-		label.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, true));
-		comp.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, true));
-		label.getParent().requestLayout();
-		comp.getParent().requestLayout();
+		int dimensX = (int) Math.round(rowtwoc.getSize().x * 1.25);
+		rembtn.requestLayout();
+		shell.requestLayout();
+		shell.setSize(dimensX, (rowonec.getSize().y * 2 + rowtwoc.getSize().y));
+		auxgrds[3] = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+		refrbtn.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ccoords = refreshCoords();
+				setLabelTxt(ccoords, label);
+				is_exp.compareAndSet(true, false);
+				rowonec.redraw();
+				rowonec.update();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 		expbtn.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				new CompanionFile(mcoords);
+				if (!is_exp.get()) {
+					new CompanionFile(ccoords);
+					is_exp.compareAndSet(false, true);
+				} else {
+					GridLayout errlay = glay;
+					Shell sh = new Shell(shell);
+					errlay.horizontalSpacing = SWT.DEFAULT;
+					sh.setLayout(errlay);
+					Label errlabl = new Label(sh, SWT.NONE);
+					errlabl.setImage(display.getSystemImage(SWT.ICON_ERROR));
+					int errspacer = errlabl.getImage().getImageData().width / 2;
+					errlay.marginLeft = errspacer;
+					errlay.marginRight = errspacer;
+					errlay.horizontalSpacing = errspacer / 2;
+					Label msglabl = new Label(sh, SWT.NONE);
+					msglabl.setText("This pair is already exported. Nothing has been done.");
+					String instr = "Press ESC to return to the main window";
+					sh.setToolTipText(instr);
+
+					for (Control cont : sh.getChildren()) {
+						cont.setToolTipText(instr);
+					}
+					msglabl.setLayoutData(auxgrds[3]);
+					errlabl.pack();
+					msglabl.pack();
+					sh.pack();
+					sh.open();
+				}
 			}
 
 			@Override
@@ -100,6 +164,7 @@ public class Main {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					PairHandler.deleteExport();
+					is_exp.compareAndSet(true, false);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -110,6 +175,7 @@ public class Main {
 
 			}
 		});
+		shell.setDefaultButton(expbtn);
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
@@ -123,37 +189,29 @@ public class Main {
 		double curlat, curlong;
 		curlat = coords.getLat();
 		curlong = coords.getLongit();
-		String fcoords = String.format("%.5f, %.5f", curlat, curlong);
+		String mcoords = String.format("%.5f, %.5f", curlat, curlong);
 		Clipboard cpcoords = Toolkit.getDefaultToolkit().getSystemClipboard();
-		StringSelection injec = new StringSelection(fcoords);
+		StringSelection injec = new StringSelection(mcoords);
 		try {
 			ExecutorService execr = Executors.newSingleThreadExecutor();
 			execr.submit(() -> cpcoords.setContents(injec, null));
-			System.out.printf("Successfully copied coordinates to clipboard.");
+			System.out.printf("Successfully copied coordinates to clipboard.\n");
 			execr.shutdown();
 		} catch (Exception e) {
 			System.out.printf("\nSomething went wrong when copying the coordinates to the clipboard: %s",
 					e.getMessage());
 		}
-		return fcoords;
+		return mcoords;
+	}
+
+	public static void setLabelTxt(String mcoords, Label label) {
+		label.setText("Your new mock coordinates: " + mcoords);
+		label.redraw();
+		label.update();
 	}
 
 	public static void main(String[] args) throws IOException {
-		/*
-		 * Pair coords = new Pair(); double curlat, curlong; curlat = coords.getLat();
-		 * curlong = coords.getLongit(); String fcoords = String.format("%.5f, %.5f",
-		 * curlat, curlong); Clipboard cpcoords =
-		 * Toolkit.getDefaultToolkit().getSystemClipboard(); StringSelection injec = new
-		 * StringSelection(fcoords); try { ExecutorService execr =
-		 * Executors.newSingleThreadExecutor(); execr.submit(() ->
-		 * cpcoords.setContents(injec, null));
-		 * System.out.printf("Successfully copied coordinates to clipboard."); } catch
-		 * (Exception e) { System.out.
-		 * printf("\nSomething went wrong when copying the coordinates to the clipboard: %s"
-		 * , e.getMessage()); }
-		 */
-		String fcoords = refreshCoords();
-		createInterf(fcoords);
-		// new CompanionFile(fcoords);
+		ccoords = refreshCoords();
+		createInterf();
 	}
 }

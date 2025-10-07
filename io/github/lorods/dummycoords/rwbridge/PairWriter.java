@@ -1,9 +1,7 @@
 package io.github.lorods.dummycoords.rwbridge;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,7 +13,7 @@ public class PairWriter implements PairHandler {
 		ExecutorService execr = Executors.newSingleThreadExecutor();
 		execr.submit(() -> {
 			try {
-				System.out.printf("%s", companionpath.toString());
+				System.out.printf("%s\n", companionpath.toString());
 				bw.write(fcoords);
 				bw.newLine();
 				bw.flush();
