@@ -40,7 +40,7 @@ public class Main {
 		Composite rowonec = new Composite(shell, SWT.NONE);
 		Button refrbtn = new Button(rowonec, SWT.NONE);
 		refrbtn.setBackground(new Color(119, 118, 123));
-		Label label = new Label(rowonec, SWT.NONE);
+		Label label = new Label(rowonec, SWT.CENTER);
 		Composite rowtwoc = new Composite(shell, SWT.NONE);
 		GridLayout glay = new GridLayout(2, false);
 		glay.horizontalSpacing = 25;
@@ -63,6 +63,7 @@ public class Main {
 		rembtn.pack();
 		label.pack();
 		shell.pack();
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		GridData[] auxgrds = new GridData[4];
 		auxgrds[0] = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
 		auxgrds[0].minimumWidth = (int) Math.round(openbtn.getSize().x * 1.1);
@@ -90,8 +91,7 @@ public class Main {
 				ccoords = refreshCoords();
 				setLabelTxt(ccoords, label);
 				is_exp.compareAndSet(true, false);
-				rowonec.redraw();
-				rowonec.update();
+				rowonec.pack();
 			}
 
 			@Override
@@ -119,7 +119,7 @@ public class Main {
 					errlay.marginRight = errspacer;
 					errlay.horizontalSpacing = errspacer / 2;
 					Label msglabl = new Label(sh, SWT.NONE);
-					msglabl.setText("This pair is already exported. Nothing has been done.");
+					msglabl.setText("This pair is already exported. Nothing else has been done.");
 					String instr = "Press ESC to return to the main window";
 					sh.setToolTipText(instr);
 
@@ -206,8 +206,7 @@ public class Main {
 
 	public static void setLabelTxt(String mcoords, Label label) {
 		label.setText("Your new mock coordinates: " + mcoords);
-		label.redraw();
-		label.update();
+		label.pack();
 	}
 
 	public static void main(String[] args) throws IOException {
