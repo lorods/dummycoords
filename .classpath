@@ -12,5 +12,13 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/org.eclipse.swt.gtk.linux.x86_64/org.eclipse.swt.gtk.linux.x86_64_3.131.0.v20250820-1556.jar"/>
+	<classpathentry kind="lib" path="swing2swt.jar"/>
+	<classpathentry kind="lib" path="/home/lorod/.p2/pool/plugins/org.eclipse.core.databinding_1.13.600.v20250726-1743.jar" sourcepath="/home/lorod/.p2/pool/plugins/org.eclipse.core.databinding_1.13.600.v20250726-1743.jar"/>
+	<classpathentry kind="lib" path="/home/lorod/.p2/pool/plugins/org.eclipse.core.databinding.beans_1.10.400.v20250409-0730.jar" sourcepath="/home/lorod/.p2/pool/plugins/org.eclipse.core.databinding.beans_1.10.400.v20250409-0730.jar"/>
+	<classpathentry kind="lib" path="/home/lorod/.p2/pool/plugins/org.eclipse.core.databinding.observable_1.13.400.v20250409-0730.jar" sourcepath="/home/lorod/.p2/pool/plugins/org.eclipse.core.databinding.observable_1.13.400.v20250409-0730.jar"/>
+	<classpathentry kind="lib" path="/home/lorod/.p2/pool/plugins/org.eclipse.core.databinding.property_1.10.400.v20250409-0730.jar" sourcepath="/home/lorod/.p2/pool/plugins/org.eclipse.core.databinding.property_1.10.400.v20250409-0730.jar"/>
+	<classpathentry kind="lib" path="/home/lorod/.p2/pool/plugins/org.eclipse.jface.databinding_1.15.300.v20240424-0444.jar" sourcepath="/home/lorod/.p2/pool/plugins/org.eclipse.jface.databinding_1.15.300.v20240424-0444.jar"/>
+	<classpathentry kind="lib" path="/home/lorod/.p2/pool/plugins/org.eclipse.equinox.common_3.20.200.v20250628-0509.jar" sourcepath="/home/lorod/.p2/pool/plugins/org.eclipse.equinox.common_3.20.200.v20250628-0509.jar"/>
+	<classpathentry kind="lib" path="/home/lorod/.p2/pool/plugins/com.ibm.icu_77.1.0.jar" sourcepath="/home/lorod/.p2/pool/plugins/com.ibm.icu_77.1.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

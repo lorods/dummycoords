@@ -19,12 +19,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import io.github.lorods.dummycoords.instantiable.CompanionFile;
 import io.github.lorods.dummycoords.instantiable.Pair;
 import io.github.lorods.dummycoords.interf.PairHandler;
+import io.github.lorods.dummycoords.utils.DialogManager;
 
 public class Main {
 
@@ -34,7 +37,7 @@ public class Main {
 		AtomicBoolean is_exp = new AtomicBoolean(false);
 		Display display = new Display();
 		String sysfnname = display.getSystemFont().getFontData()[0].getName();
-		Shell shell = new Shell(display);
+		Shell shell = new Shell(display, SWT.SHELL_TRIM);
 		GridLayout shlay = new GridLayout(1, false);
 		shell.setLayout(shlay);
 		Composite rowonec = new Composite(shell, SWT.NONE);
@@ -64,7 +67,7 @@ public class Main {
 		label.pack();
 		shell.pack();
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		GridData[] auxgrds = new GridData[4];
+		GridData[] auxgrds = new GridData[3];
 		auxgrds[0] = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
 		auxgrds[0].minimumWidth = (int) Math.round(openbtn.getSize().x * 1.1);
 		openbtn.setLayoutData(auxgrds[0]);
@@ -83,7 +86,21 @@ public class Main {
 		rembtn.requestLayout();
 		shell.requestLayout();
 		shell.setSize(dimensX, (rowonec.getSize().y * 2 + rowtwoc.getSize().y));
-		auxgrds[3] = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+		shell.addListener(SWT.Resize, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				rowonec.pack();
+				label.pack();
+				label.redraw();
+				label.update();
+				label.requestLayout();
+				rowonec.requestLayout();
+				rowonec.redraw();
+				rowonec.update();
+			}
+		});
+
 		refrbtn.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -105,32 +122,26 @@ public class Main {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (!is_exp.get()) {
-					new CompanionFile(ccoords);
+					boolean isw = true;
+					new DialogManager(ccoords, isw, glay, shell, display);
 					is_exp.compareAndSet(false, true);
 				} else {
-					GridLayout errlay = glay;
-					Shell sh = new Shell(shell);
-					errlay.horizontalSpacing = SWT.DEFAULT;
-					sh.setLayout(errlay);
-					Label errlabl = new Label(sh, SWT.NONE);
-					errlabl.setImage(display.getSystemImage(SWT.ICON_ERROR));
-					int errspacer = errlabl.getImage().getImageData().width / 2;
-					errlay.marginLeft = errspacer;
-					errlay.marginRight = errspacer;
-					errlay.horizontalSpacing = errspacer / 2;
-					Label msglabl = new Label(sh, SWT.NONE);
-					msglabl.setText("This pair is already exported. Nothing else has been done.");
-					String instr = "Press ESC to return to the main window";
-					sh.setToolTipText(instr);
-
-					for (Control cont : sh.getChildren()) {
-						cont.setToolTipText(instr);
-					}
-					msglabl.setLayoutData(auxgrds[3]);
-					errlabl.pack();
-					msglabl.pack();
-					sh.pack();
-					sh.open();
+					boolean isw = false;
+					new DialogManager(ccoords, isw, glay, shell, display);
+					/*
+					 * GridLayout errlay = glay; Shell errsh = new Shell(shell);
+					 * errlay.horizontalSpacing = SWT.DEFAULT; errsh.setLayout(errlay); Label
+					 * errlabl = new Label(errsh, SWT.NONE);
+					 * errlabl.setImage(display.getSystemImage(SWT.ICON_ERROR)); int errspacer =
+					 * errlabl.getImage().getImageData().width / 2; errlay.marginLeft = errspacer;
+					 * errlay.marginRight = errspacer; errlay.horizontalSpacing = errspacer / 2;
+					 * Label msglabl = new Label(errsh, SWT.NONE);
+					 * msglabl.setText("This pair is already exported. Nothing else has been done."
+					 * ); String instr = "Press ESC to return to the main window";
+					 * errsh.setToolTipText(instr); for (Control cont : errsh.getChildren()) {
+					 * cont.setToolTipText(instr); } msglabl.setLayoutData(auxgrds[3]);
+					 * errlabl.pack(); msglabl.pack(); errsh.pack(); errsh.open();
+					 */
 				}
 			}
 

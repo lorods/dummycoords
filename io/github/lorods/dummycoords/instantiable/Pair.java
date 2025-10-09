@@ -25,8 +25,8 @@ public class Pair implements Serializable {
 
 	public Pair() {
 		Random gen = new Random();
-		lat = gen.nextDouble() * 180 - 90;
-		longit = gen.nextDouble() * 360 - 180;
+		this.lat = gen.nextDouble() * 180 - 90;
+		this.longit = gen.nextDouble() * 360 - 180;
 		// refer to https://wiki.openstreetmap.org/wiki/Node#Structure and
 		// https://wiki.openstreetmap.org/wiki/Precision_of_coordinates#Conversion_to_decimal
 		// for the specs behind this
