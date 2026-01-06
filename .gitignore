@@ -1,3 +1,6 @@
 
 io/github/lorods/dummycoords/utils/_Test.java
 *.class
+todo.txt
+companion/export.dat
+io/github/lorods/dummycoords/utils/ExportMonitor.java

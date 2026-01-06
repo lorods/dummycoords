@@ -4,6 +4,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,9 +33,10 @@ import io.github.lorods.dummycoords.utils.DialogManager;
 public class Main {
 
 	public static String ccoords;
+	//public static String prevcoords = "-";
+	public static AtomicBoolean is_exp = new AtomicBoolean(false);
 
 	public static void createInterf() {
-		AtomicBoolean is_exp = new AtomicBoolean(false);
 		Display display = new Display();
 		String sysfnname = display.getSystemFont().getFontData()[0].getName();
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
@@ -121,13 +123,16 @@ public class Main {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				CountDownLatch latch = new CountDownLatch(1);
+				DialogManager dialmgr;
+				boolean isw;
 				if (!is_exp.get()) {
-					boolean isw = true;
-					new DialogManager(ccoords, isw, glay, shell, display);
-					is_exp.compareAndSet(false, true);
+					isw = true;
+					// dialmgr = new DialogManager(ccoords, isw, glay, shell, display);
+					// is_exp.compareAndSet(false, true);
 				} else {
-					boolean isw = false;
-					new DialogManager(ccoords, isw, glay, shell, display);
+					isw = false;
+					// dialmgr = new DialogManager(ccoords, isw, glay, shell, display);
 					/*
 					 * GridLayout errlay = glay; Shell errsh = new Shell(shell);
 					 * errlay.horizontalSpacing = SWT.DEFAULT; errsh.setLayout(errlay); Label
@@ -143,6 +148,16 @@ public class Main {
 					 * errlabl.pack(); msglabl.pack(); errsh.pack(); errsh.open();
 					 */
 				}
+				dialmgr = new DialogManager(ccoords, isw, glay, shell, display);
+				dialmgr.addPropertyChangeListener(evt -> {
+					if ("expstate".equals(evt.getPropertyName())) {
+						is_exp = (AtomicBoolean) evt.getNewValue();
+						if (evt.getOldValue() != evt.getNewValue()) {
+						latch.countDown();
+						}
+					}
+				});
+				// is_exp.set(dialmgr.getIsExp().get());
 			}
 
 			@Override
@@ -220,7 +235,7 @@ public class Main {
 		label.pack();
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		ccoords = refreshCoords();
 		createInterf();
 	}
